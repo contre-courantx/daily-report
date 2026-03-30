@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>365助理 · 定时任务数据日报 (2026-03-27)</title>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js"></script>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif; background: #f0f2f5; color: #2c3e50; line-height: 1.6; }
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 16px; padding: 30px; margin-bottom: 20px; text-align: center; }
+.header h1 { font-size: 24px; margin-bottom: 6px; }
+.header .sub { opacity: 0.85; font-size: 14px; }
+.cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+.card { background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.06); transition: transform 0.2s; }
+.card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.1); }
+.card .label { font-size: 13px; color: #7f8c8d; margin-bottom: 8px; }
+.card .value { font-size: 32px; font-weight: 700; color: #2c3e50; }
+.card .change { font-size: 13px; margin-top: 6px; }
+.up { color: #27ae60; font-weight: 600; }
+.down { color: #e74c3c; font-weight: 600; }
+.chart-box { background: white; border-radius: 12px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.chart-box h3 { font-size: 16px; color: #2c3e50; margin-bottom: 12px; padding-left: 10px; border-left: 3px solid #667eea; }
+.chart { width: 100%; height: 350px; }
+.chart-half { width: 100%; height: 300px; }
+.row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 20px; }
+.insights { background: white; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px; }
+.insights h3 { font-size: 16px; color: #2c3e50; margin-bottom: 14px; padding-left: 10px; border-left: 3px solid #f5a623; }
+.insights ul { list-style: none; padding: 0; }
+.insights li { padding: 10px 14px; margin-bottom: 8px; background: #f8f9fa; border-radius: 8px; font-size: 14px; border-left: 3px solid #667eea; }
+.insights li strong { color: #667eea; }
+.data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.data-table th { background: #f0f2f5; padding: 10px 12px; text-align: left; font-weight: 600; border-bottom: 2px solid #ddd; }
+.data-table td { padding: 8px 12px; border-bottom: 1px solid #eee; }
+.data-table tr:hover { background: #f8f9fa; }
+.data-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.footer { text-align: center; padding: 20px; color: #bbb; font-size: 12px; }
+@media (max-width: 768px) { .cards { grid-template-columns: repeat(2, 1fr); } .row { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="container">
+
+<div class="header">
+  <h1>365 助理 · 定时任务数据日报</h1>
+  <div class="sub">报告日期: 2026-03-27 &nbsp;|&nbsp; 数据范围: 2026-02-25 ~ 2026-03-26 &nbsp;|&nbsp; 共 30 天</div>
+</div>
+
+<div class="cards">
+  <div class="card">
+    <div class="label">昨日 DAU</div>
+    <div class="value">113</div>
+    <div class="change"><span class="up">&#9650; +5.6%</span> 日环比</div>
+  </div>
+  <div class="card">
+    <div class="label">昨日 PV</div>
+    <div class="value">170</div>
+    <div class="change"><span class="up">&#9650; +6.2%</span> 日环比</div>
+  </div>
+  <div class="card">
+    <div class="label">近7天 DAU 均值</div>
+    <div class="value">107</div>
+    <div class="change"><span class="up">&#9650; +14.8%</span> 周环比</div>
+  </div>
+  <div class="card">
+    <div class="label">近30天 DAU 均值</div>
+    <div class="value">86</div>
+    <div class="change"><span style="color:#7f8c8d">共 30 天数据</span></div>
+  </div>
+</div>
+
+<div class="chart-box">
+  <h3>DAU & PV 趋势（近30天）</h3>
+  <div id="chart-trend" class="chart"></div>
+</div>
+
+<div class="row">
+  <div class="chart-box">
+    <h3>近7天 DAU 详情</h3>
+    <div id="chart-bar" class="chart-half"></div>
+  </div>
+  <div class="chart-box">
+    <h3>本周 vs 上周 DAU</h3>
+    <div id="chart-compare" class="chart-half"></div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="chart-box">
+    <h3>人均使用次数 (PV/DAU)</h3>
+    <div id="chart-ratio" class="chart-half"></div>
+  </div>
+  <div class="insights">
+    <h3>Key Insights</h3>
+    <ul>
+      <li>昨日 DAU <strong>113</strong>，日环比 <strong>+5.6%</strong>，连续走高</li>
+      <li>近7天 DAU 均值 <strong>107</strong>，较上周 <strong>+14.8%</strong>，增长强劲</li>
+      <li>30天 DAU 从 <strong>64</strong> 升至 <strong>113</strong>，整体增长 <strong>77%</strong></li>
+      <li>人均使用 <strong>1.51</strong> 次/人，用户粘性稳定</li>
+      <li>DAU 峰值 <strong>119</strong>（2026-03-20）</li>
+    </ul>
+  </div>
+</div>
+
+<div class="chart-box">
+  <h3>明细数据</h3>
+  <table class="data-table">
+    <thead><tr><th>日期</th><th class="num">DAU</th><th class="num">PV</th><th class="num">人均次数</th></tr></thead>
+    <tbody><tr><td>2026-03-26</td><td class="num">113</td><td class="num">170</td><td class="num">1.50</td></tr>
+<tr><td>2026-03-25</td><td class="num">107</td><td class="num">160</td><td class="num">1.50</td></tr>
+<tr><td>2026-03-24</td><td class="num">103</td><td class="num">155</td><td class="num">1.50</td></tr>
+<tr><td>2026-03-23</td><td class="num">105</td><td class="num">155</td><td class="num">1.48</td></tr>
+<tr><td>2026-03-22</td><td class="num">101</td><td class="num">150</td><td class="num">1.49</td></tr>
+<tr><td>2026-03-21</td><td class="num">103</td><td class="num">149</td><td class="num">1.45</td></tr>
+<tr><td>2026-03-20</td><td class="num">119</td><td class="num">183</td><td class="num">1.54</td></tr>
+<tr><td>2026-03-19</td><td class="num">100</td><td class="num">152</td><td class="num">1.52</td></tr>
+<tr><td>2026-03-18</td><td class="num">97</td><td class="num">143</td><td class="num">1.47</td></tr>
+<tr><td>2026-03-17</td><td class="num">90</td><td class="num">130</td><td class="num">1.44</td></tr>
+<tr><td>2026-03-16</td><td class="num">89</td><td class="num">133</td><td class="num">1.49</td></tr>
+<tr><td>2026-03-15</td><td class="num">86</td><td class="num">124</td><td class="num">1.44</td></tr>
+<tr><td>2026-03-14</td><td class="num">89</td><td class="num">128</td><td class="num">1.44</td></tr>
+<tr><td>2026-03-13</td><td class="num">103</td><td class="num">148</td><td class="num">1.44</td></tr>
+<tr><td>2026-03-12</td><td class="num">83</td><td class="num">125</td><td class="num">1.51</td></tr>
+<tr><td>2026-03-11</td><td class="num">85</td><td class="num">126</td><td class="num">1.48</td></tr>
+<tr><td>2026-03-10</td><td class="num">79</td><td class="num">116</td><td class="num">1.47</td></tr>
+<tr><td>2026-03-09</td><td class="num">81</td><td class="num">123</td><td class="num">1.52</td></tr>
+<tr><td>2026-03-08</td><td class="num">74</td><td class="num">112</td><td class="num">1.51</td></tr>
+<tr><td>2026-03-07</td><td class="num">76</td><td class="num">114</td><td class="num">1.50</td></tr>
+<tr><td>2026-03-06</td><td class="num">86</td><td class="num">139</td><td class="num">1.62</td></tr>
+<tr><td>2026-03-05</td><td class="num">73</td><td class="num">113</td><td class="num">1.55</td></tr>
+<tr><td>2026-03-04</td><td class="num">74</td><td class="num">109</td><td class="num">1.47</td></tr>
+<tr><td>2026-03-03</td><td class="num">71</td><td class="num">105</td><td class="num">1.48</td></tr>
+<tr><td>2026-03-02</td><td class="num">72</td><td class="num">107</td><td class="num">1.49</td></tr>
+<tr><td>2026-03-01</td><td class="num">66</td><td class="num">97</td><td class="num">1.47</td></tr>
+<tr><td>2026-02-28</td><td class="num">67</td><td class="num">99</td><td class="num">1.48</td></tr>
+<tr><td>2026-02-27</td><td class="num">72</td><td class="num">108</td><td class="num">1.50</td></tr>
+<tr><td>2026-02-26</td><td class="num">64</td><td class="num">125</td><td class="num">1.95</td></tr>
+<tr><td>2026-02-25</td><td class="num">64</td><td class="num">99</td><td class="num">1.55</td></tr>
+</tbody>
+  </table>
+</div>
+
+<div class="footer">Auto Generated by SQL Runner &nbsp;|&nbsp; Data Source: hive.dw_woa_server.ai_createrequest</div>
+
+</div>
+
+<script>
+var dates = ['2026-02-25', '2026-02-26', '2026-02-27', '2026-02-28', '2026-03-01', '2026-03-02', '2026-03-03', '2026-03-04', '2026-03-05', '2026-03-06', '2026-03-07', '2026-03-08', '2026-03-09', '2026-03-10', '2026-03-11', '2026-03-12', '2026-03-13', '2026-03-14', '2026-03-15', '2026-03-16', '2026-03-17', '2026-03-18', '2026-03-19', '2026-03-20', '2026-03-21', '2026-03-22', '2026-03-23', '2026-03-24', '2026-03-25', '2026-03-26'];
+var daus = [64, 64, 72, 67, 66, 72, 71, 74, 73, 86, 76, 74, 81, 79, 85, 83, 103, 89, 86, 89, 90, 97, 100, 119, 103, 101, 105, 103, 107, 113];
+var pvs = [99, 125, 108, 99, 97, 107, 105, 109, 113, 139, 114, 112, 123, 116, 126, 125, 148, 128, 124, 133, 130, 143, 152, 183, 149, 150, 155, 155, 160, 170];
+var ratios = [1.55, 1.95, 1.5, 1.48, 1.47, 1.49, 1.48, 1.47, 1.55, 1.62, 1.5, 1.51, 1.52, 1.47, 1.48, 1.51, 1.44, 1.44, 1.44, 1.49, 1.44, 1.47, 1.52, 1.54, 1.45, 1.49, 1.48, 1.5, 1.5, 1.5];
+
+// 趋势图
+var c1 = echarts.init(document.getElementById('chart-trend'));
+c1.setOption({
+  tooltip: { trigger: 'axis', axisPointer: { type: 'cross' } },
+  legend: { data: ['DAU', 'PV'], top: 5 },
+  grid: { left: 50, right: 50, bottom: 30, top: 40 },
+  xAxis: { type: 'category', data: dates, axisLabel: { rotate: 30, fontSize: 11 } },
+  yAxis: [
+    { type: 'value', name: 'DAU', splitLine: { lineStyle: { type: 'dashed', opacity: 0.3 } } },
+    { type: 'value', name: 'PV', splitLine: { show: false } }
+  ],
+  series: [
+    { name: 'DAU', type: 'line', data: daus, smooth: true, symbol: 'circle', symbolSize: 6,
+      lineStyle: { width: 3, color: '#4A90D9' }, itemStyle: { color: '#4A90D9' },
+      areaStyle: { color: { type:'linear', x:0, y:0, x2:0, y2:1, colorStops:[{offset:0,color:'rgba(74,144,217,0.25)'},{offset:1,color:'rgba(74,144,217,0.02)'}] } },
+      markPoint: { data: [{ type: 'max', name: 'Max' }], symbolSize: 50, label: { fontSize: 11 } }
+    },
+    { name: 'PV', type: 'line', yAxisIndex: 1, data: pvs, smooth: true, symbol: 'diamond', symbolSize: 5,
+      lineStyle: { width: 2, color: '#F5A623', type: 'dashed' }, itemStyle: { color: '#F5A623' }
+    }
+  ]
+});
+
+// 近7天柱状图
+var last7d = dates.slice(-7), last7v = daus.slice(-7);
+var c2 = echarts.init(document.getElementById('chart-bar'));
+c2.setOption({
+  tooltip: { trigger: 'axis' },
+  grid: { left: 40, right: 20, bottom: 30, top: 30 },
+  xAxis: { type: 'category', data: last7d.map(function(d){return d.slice(5);}), axisLabel: { fontSize: 12 } },
+  yAxis: { type: 'value', min: function(v){return Math.floor(v.min*0.9);}, splitLine: { lineStyle: { type:'dashed', opacity:0.3 } } },
+  series: [{
+    type: 'bar', data: last7v, barWidth: '50%',
+    itemStyle: { color: function(p){ return p.value===Math.max.apply(null,last7v)?'#27ae60':'#4A90D9'; }, borderRadius: [4,4,0,0] },
+    label: { show: true, position: 'top', fontWeight: 'bold', fontSize: 13 },
+    markLine: { data: [{ type: 'average', name: 'Avg' }], lineStyle: { color: '#e74c3c', type: 'dashed' }, label: { fontSize: 11 } }
+  }]
+});
+
+// 本周vs上周
+var tw = daus.slice(-7), lw = daus.slice(-14,-7);
+var c3 = echarts.init(document.getElementById('chart-compare'));
+c3.setOption({
+  tooltip: { trigger: 'axis' },
+  legend: { data: ['上周','本周'], top: 5 },
+  grid: { left: 40, right: 20, bottom: 30, top: 40 },
+  xAxis: { type: 'category', data: last7d.map(function(d){return d.slice(5);}), axisLabel: { fontSize: 12 } },
+  yAxis: { type: 'value', min: function(v){return Math.floor(v.min*0.85);}, splitLine: { lineStyle: { type:'dashed', opacity:0.3 } } },
+  series: [
+    { name: '上周', type: 'bar', data: lw, barWidth: '30%', itemStyle: { color: '#BDC3C7', borderRadius: [3,3,0,0] } },
+    { name: '本周', type: 'bar', data: tw, barWidth: '30%', itemStyle: { color: '#4A90D9', borderRadius: [3,3,0,0] },
+      label: { show: true, position: 'top', fontSize: 11, formatter: function(p){ var c=lw[p.dataIndex]>0?((tw[p.dataIndex]-lw[p.dataIndex])/lw[p.dataIndex]*100).toFixed(0):0; return (c>=0?'+':'')+c+'%'; }, color: function(p){ var c=(tw[p.dataIndex]-lw[p.dataIndex]); return c>=0?'#27ae60':'#e74c3c'; } } }
+  ]
+});
+
+// 人均使用次数
+var c4 = echarts.init(document.getElementById('chart-ratio'));
+c4.setOption({
+  tooltip: { trigger: 'axis', formatter: function(p){ return p[0].name+'<br/>人均: <b>'+p[0].value+'</b> 次/人'; } },
+  grid: { left: 50, right: 20, bottom: 30, top: 20 },
+  xAxis: { type: 'category', data: dates, axisLabel: { rotate: 30, fontSize: 10 } },
+  yAxis: { type: 'value', name: '次/人', splitLine: { lineStyle: { type:'dashed', opacity:0.3 } } },
+  series: [{
+    type: 'line', data: ratios, smooth: true, symbol: 'circle', symbolSize: 4,
+    lineStyle: { width: 2.5, color: '#9B59B6' }, itemStyle: { color: '#9B59B6' },
+    areaStyle: { color: { type:'linear', x:0,y:0,x2:0,y2:1, colorStops:[{offset:0,color:'rgba(155,89,182,0.2)'},{offset:1,color:'rgba(155,89,182,0.02)'}] } },
+    markLine: { data: [{ type: 'average', name: 'Avg' }], lineStyle: { color: '#e74c3c', type: 'dashed' }, label: { fontSize: 11 } }
+  }]
+});
+
+window.addEventListener('resize', function(){ c1.resize(); c2.resize(); c3.resize(); c4.resize(); });
+</script>
+</body>
+</html>
